@@ -1,0 +1,40 @@
+IPython 7.12.0 -- An enhanced Interactive Python. Type '?' for help.
+
+In [1]: run -m ecco models/termites-simpler.rr                                                                         
+
+In [2]: model.petri()                                                                                                  
+Out[2]: <ptnet.net.Net at 0x11d6f8110>
+
+In [3]: o=_2                                                                                                           
+
+In [4]: o.write(open( 'toto.dot', 'w' ), fmt="dot" )                                                                   
+
+In [5]: ls -l                                                                                                          
+total 48
+-rw-r--r--   1 gc  staff    46 Feb 10 08:49 Makefile
+drwxr-xr-x   5 gc  staff   160 Feb 11 14:53 cunf/
+-rw-r--r--   1 gc  staff    96 Feb 11 15:07 deps
+drwxr-xr-x  16 gc  staff   512 Feb 11 14:15 ecco/
+drwxr-xr-x   8 gc  staff   256 Feb 11 15:03 models/
+drwxr-xr-x   7 gc  staff   224 Feb 10 14:08 ptnet/
+-rw-r--r--   1 gc  staff   170 Feb 11 15:15 todo.md
+-rw-r--r--   1 gc  staff  8879 Feb 11 15:20 toto.dot
+
+In [6]: exit                                                                                                           
+gc@MACBOOKP13R15 ecosys % dot -T pdf toto.dot -o toto.pdf
+gc@MACBOOKP13R15 ecosys % open toto.pdf
+gc@MACBOOKP13R15 ecosys % neato -T pdf toto.dot -o toto.pdf
+gc@MACBOOKP13R15 ecosys % fdp -T pdf toto.dot -o toto.pdf
+gc@MACBOOKP13R15 ecosys % ipython                          
+Python 3.7.6 (default, Dec 30 2019, 19:38:26) 
+Type 'copyright', 'credits' or 'license' for more information
+IPython 7.12.0 -- An enhanced Interactive Python. Type '?' for help.
+
+In [1]: run -m ecco models/termites-simpler.rr                                                                         
+
+In [2]: u=model.unfold()                                                                                               
+
+In [3]: u.write( open( 'toto_unfold.dot', 'w' ), fmt='dot' )                                                           
+
+In [4]: exit                                                                                                           
+gc@MACBOOKP13R15 ecosys % dot -T pdf toto_unfold.dot -o toto_unfold.pdf
