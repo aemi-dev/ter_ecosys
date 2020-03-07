@@ -1043,25 +1043,29 @@ class Model (_Model) :
                         t.pre_add(places[on])
                         t.post_add(places[off])
                     elif off in r.left and off in r.right :
-                        t.cont_add(places[off])
+                        if ra == True:
+                            t.cont_add(places[off])
+                        else:
+                            t.pre_add(places[off])
+                            t.post_add(places[off])
                     elif off in r.left and on in r.right :
                         t.pre_add(places[off])
                         t.post_add(places[on])
         return n
     def unfold (self,unf="cunf",rule="mcm",ra=True) :
-        n = NULL
+        n = None
         if unf == "punf" :
             n = self.petri(ra=False)
-        else if unf == "cunf" :
+        elif unf == "cunf" :
             n = self.petri(ra)
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8") as pep,\
-             tempfile.NamedTemporaryFile("rb") as cuf :
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix="pnml") as pep,\
+             tempfile.NamedTemporaryFile("rb") as cuf:
             n.write(pep)
             pep.flush()
             if unf == "cunf":
                 os.system("cunf -c %s -s %s %s" % (rule,cuf.name, pep.name))
-            else if unf == "punf":
-                os.system("punf -f %s -m %s" % (pep.name, cuf.name))
+            elif unf == "punf":
+                os.system("punf -f %s -m %s" % (cuf.name, pep.name))
             u = ptnet.unfolding.Unfolding()
             u.read(cuf)
         return u
