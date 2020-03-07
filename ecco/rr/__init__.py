@@ -1019,7 +1019,7 @@ class Model (_Model) :
     ##
     ## Petri nets
     ##
-    def petri (self) :
+    def petri (self,ra=True) :
         n = ptnet.net.Net()
         places = {}
         for state in (s.state for s in self.spec.meta) :
@@ -1034,7 +1034,11 @@ class Model (_Model) :
                     on = State(v, True)
                     off = State(v, False)
                     if on in r.left and on in r.right :
-                        t.cont_add(places[on])
+                        if ra == True:
+                            t.cont_add(places[on])
+                        else:
+                            t.pre_add(places[on])
+                            t.post_add(places[on])
                     elif on in r.left and off in r.right :
                         t.pre_add(places[on])
                         t.post_add(places[off])
@@ -1044,13 +1048,20 @@ class Model (_Model) :
                         t.pre_add(places[off])
                         t.post_add(places[on])
         return n
-    def unfold (self) :
-        n = self.petri()
+    def unfold (self,unf="cunf",rule="mcm",ra=True) :
+        n = NULL
+        if unf == "punf" :
+            n = self.petri(ra=False)
+        else if unf == "cunf" :
+            n = self.petri(ra)
         with tempfile.NamedTemporaryFile("w", encoding="utf-8") as pep,\
              tempfile.NamedTemporaryFile("rb") as cuf :
             n.write(pep)
             pep.flush()
-            os.system("cunf -s %s %s" % (cuf.name, pep.name))
+            if unf == "cunf":
+                os.system("cunf -c %s -s %s %s" % (rule,cuf.name, pep.name))
+            else if unf == "punf":
+                os.system("punf -f %s -m %s" % (pep.name, cuf.name))
             u = ptnet.unfolding.Unfolding()
             u.read(cuf)
         return u
