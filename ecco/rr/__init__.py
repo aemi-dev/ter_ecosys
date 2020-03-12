@@ -1058,14 +1058,14 @@ class Model (_Model) :
             n = self.petri(ra=False)
         elif unf == "cunf" :
             n = self.petri(ra)
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix="pnml") as pep,\
-             tempfile.NamedTemporaryFile("rb") as cuf:
-            n.write(pep)
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8") as pep,\
+             tempfile.NamedTemporaryFile("rb", suffix=".pnml") as cuf:
+            n.write(pep,fmt='pnml')
             pep.flush()
             if unf == "cunf":
                 os.system("cunf -c %s -s %s %s" % (rule,cuf.name, pep.name))
             elif unf == "punf":
-                os.system("punf -f %s -m %s" % (cuf.name, pep.name))
+                os.system("punf -f=%s -m=%s" % (cuf.name, pep.name))
             u = ptnet.unfolding.Unfolding()
             u.read(cuf)
         return u
