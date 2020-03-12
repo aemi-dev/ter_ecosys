@@ -1,4 +1,4 @@
-import itertools, re, os, tempfile, operator, functools
+import itertools, re, os, tempfile, operator, functools, sys
 import pandas as pd
 import numpy as np
 import ptnet
@@ -1058,20 +1058,22 @@ class Model (_Model) :
             n = self.petri(ra=False)
         elif unf == "cunf" :
             n = self.petri(ra)
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8") as pep,\
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".pnml") as pep,\
              tempfile.NamedTemporaryFile("rb", suffix=".pnml") as cuf:
             if unf=="punf":
                 n.write(pep,fmt='pnml')
+
+                n.write(sys.stdout,fmt='pnml')
             else:
                 n.write(pep)
             pep.flush()
             if unf == "cunf":
                 os.system("cunf -c %s -s %s %s" % (rule,cuf.name, pep.name))
             elif unf == "punf":
-                os.system("punf -f=%s -m=%s" % (cuf.name, pep.name))
+                os.system("punf -f=%s -m=%s" % (pep.name, cuf.name))
             u = ptnet.unfolding.Unfolding()
             if unf=="punf":
-                u.read(cuf,fmt="pnml")
+                u.read(cuf,fmt='pnml')
             else:
                 u.read(cuf)
         return u
