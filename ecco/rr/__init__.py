@@ -1060,14 +1060,20 @@ class Model (_Model) :
             n = self.petri(ra)
         with tempfile.NamedTemporaryFile("w", encoding="utf-8") as pep,\
              tempfile.NamedTemporaryFile("rb", suffix=".pnml") as cuf:
-            n.write(pep,fmt='pnml')
+            if unf=="punf":
+                n.write(pep,fmt='pnml')
+            else:
+                n.write(pep)
             pep.flush()
             if unf == "cunf":
                 os.system("cunf -c %s -s %s %s" % (rule,cuf.name, pep.name))
             elif unf == "punf":
                 os.system("punf -f=%s -m=%s" % (cuf.name, pep.name))
             u = ptnet.unfolding.Unfolding()
-            u.read(cuf)
+            if unf=="punf":
+                u.read(cuf,fmt="pnml")
+            else:
+                u.read(cuf)
         return u
 
 __extra__ = ["Model", "ComponentView", "ExplicitView", "parse", "Palette"]
