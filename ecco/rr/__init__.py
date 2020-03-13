@@ -1,4 +1,5 @@
-import itertools, re, os, tempfile, operator, functools, sys
+import itertools, re, os, tempfile, operator, functools, sys, shutil
+from xml.etree import ElementTree as ET
 import pandas as pd
 import numpy as np
 import ptnet
@@ -1054,28 +1055,48 @@ class Model (_Model) :
         return n
     def unfold (self,unf="cunf",rule="mcm",ra=True) :
         n = None
+
         if unf == "punf" :
             n = self.petri(ra=False)
         elif unf == "cunf" :
             n = self.petri(ra)
+
+
         with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".pnml") as pep,\
              tempfile.NamedTemporaryFile("rb", suffix=".pnml") as cuf:
             if unf=="punf":
                 n.write(pep,fmt='pnml')
-
-                n.write(sys.stdout,fmt='pnml')
             else:
                 n.write(pep)
             pep.flush()
             if unf == "cunf":
                 os.system("cunf -c %s -s %s %s" % (rule,cuf.name, pep.name))
             elif unf == "punf":
-                os.system("punf -f=%s -m=%s" % (pep.name, cuf.name))
+                os.system("punf -r -c -f=%s -m=%s" % (pep.name, cuf.name))
+
             u = ptnet.unfolding.Unfolding()
+
+            ET.register_namespace('',"http://www.pnml.org/version-2009/grammar/ptnet")
+
+            tree = ET.parse(cuf.name)
+            root = tree.getroot()
+
+            print(root.tag)
+            print(root.findall('original_net'))
+            print(root.findall('ns0:origina_net'))
+            print(root.findall('{http://www.pnml.org/version-2009/grammar/ptnet}original_net'))
+
+            for node in root.findall('original_net'):
+                print('\n\n\nTTTTTTTTTTT\n\n\n')
+                root.remove(node)
+
+            ET.ElementTree(root).write('cuf.bak.pnml')
+
             if unf=="punf":
-                u.read(cuf,fmt='pnml')
+                u.read(open('cuf.bak.pnml','rb'),fmt='pnml')
             else:
                 u.read(cuf)
+
         return u
 
 __extra__ = ["Model", "ComponentView", "ExplicitView", "parse", "Palette"]
