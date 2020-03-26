@@ -6,4 +6,4 @@ run: ./ecco/rr/__init__.py
 	ipython3
 
 clean:
-	rm cuf.bak.pnml
+	rm -rf *.pnml

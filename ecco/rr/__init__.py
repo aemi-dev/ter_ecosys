@@ -1081,16 +1081,36 @@ class Model (_Model) :
                 tree = etree.parse(cuf.name)
                 root = tree.getroot()
                 net = root.getchildren()[0]
+                net.set('id','n1')
+                net.set('type','http://www.pnml.org/version-2009/grammar/ptnet')
                 child = net.getchildren()[0]
                 net.remove(child)
+                page = net.getchildren()[0]
+                page.set('id','page')
+                page.remove(page.getchildren()[0])
 
-                #for target in root.findall('.//{http://www.pnml.org/version-2009/grammar/pnml}originalNode'):
-                #    target.getparent().remove(target)
+                for node in root.findall('.//{http://www.pnml.org/version-2009/grammar/pnml}originalNode'):
+                    nodeText = node.getchildren()[0].text
+                    parent = node.getparent()
+                    parent.remove(node)
+                    name = parent.getchildren()[0].getchildren()[0]
+                    nameText = name.text
+                    name.text = "b'%s':%s" % (nodeText,nameText)
+
+                for arc in root.findall('.//{http://www.pnml.org/version-2009/grammar/pnml}arc'):
+                    src = arc.get('source')
+                    tgt = arc.get('target')
+                    del arc.attrib['source']
+                    del arc.attrib['target']
+                    arc.set('id','%s%s' % (src, tgt) )
+                    arc.set('source',src)
+                    arc.set('target',tgt)
+
 
                 etree.dump(root)
 
                 et = etree.ElementTree(root)
-                et.write(open(cuf.name,'wb'), pretty_print=True)
+                et.write(open(cuf.name,'wb'), pretty_print=True, xml_declaration=True)
 
 
             if unf=="punf":

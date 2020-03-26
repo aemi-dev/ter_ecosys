@@ -977,8 +977,7 @@ class Net :
             self.__pnmlq.append (self.__pnmlitm)
             self.__pnmlitm = {}
             self.__pnmlitm['type'] = tag
-            if 'id' in self.__pnmlitm:
-                self.__pnmlitm['id'] = attr['id']
+            self.__pnmlitm['id'] = attr['id']
             for k in ['source', 'target'] :
                 if k in attr :
                     self.__pnmlitm[k] = attr[k]
