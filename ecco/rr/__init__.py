@@ -1077,19 +1077,20 @@ class Model (_Model) :
 
             u = ptnet.unfolding.Unfolding()
 
-            tree = etree.parse(cuf.name)
-            root = tree.getroot()
-            net = root.getchildren()[0]
-            child = net.getchildren()[0]
-            net.remove(child)
+            if unf == "punf":
+                tree = etree.parse(cuf.name)
+                root = tree.getroot()
+                net = root.getchildren()[0]
+                child = net.getchildren()[0]
+                net.remove(child)
 
-            for target in root.findall('.//{http://www.pnml.org/version-2009/grammar/pnml}originalNode'):
-                target.getparent().remove(target)
+                #for target in root.findall('.//{http://www.pnml.org/version-2009/grammar/pnml}originalNode'):
+                #    target.getparent().remove(target)
 
-            etree.dump(root)
+                etree.dump(root)
 
-            et = etree.ElementTree(root)
-            et.write(open(cuf.name,'wb'), pretty_print=True)
+                et = etree.ElementTree(root)
+                et.write(open(cuf.name,'wb'), pretty_print=True)
 
 
             if unf=="punf":

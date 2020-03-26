@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+<net id="n1" type="http://www.pnml.org/version-2009/grammar/ptnet">
+<name> <text>"" version "", by ""</text> </name>
+<page id="page">
+
+<!-- places -->
+<place id="p0">
+<name><text>b'Rp+':c0</text></name>
+<initialMarking> <text>1</text> </initialMarking>
+</place>
+<place id="p1">
+<name><text>b'Ec-':c1</text></name>
+<initialMarking> <text>1</text> </initialMarking>
+</place>
+<place id="p2">
+<name><text>b'Ec+':c2</text></name>
+<initialMarking> <text>0</text> </initialMarking>
+</place>
+
+<!-- transitions -->
+<transition id="t3">
+<name><text>b'R1.1':e0</text></name>
+</transition>
+
+<!-- flow relation -->
+<!-- read arc: -->
+ <arc id="ra4" source="p0" target="t3" />
+ <arc id="ra5" source="t3" target="p0" />
+<arc id="a6" source="p1" target="t3" />
+<arc id="a7" source="t3" target="p2" />
+
+</page>
+</net>
+</pnml>

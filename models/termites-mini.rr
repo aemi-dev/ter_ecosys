@@ -1,0 +1,8 @@
+inhabitants:
+    Rp+: reproductives
+
+structures:
+    Ec-: egg chambers
+
+rules:
+    Rp+ >> Ec+
