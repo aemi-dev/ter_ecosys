@@ -1,5 +1,6 @@
 import itertools, re, os, tempfile, operator, functools, sys, shutil
-from xml.etree import ElementTree as ET
+import xml.etree.ElementTree as ET
+from lxml import etree
 import pandas as pd
 import numpy as np
 import ptnet
@@ -1076,24 +1077,23 @@ class Model (_Model) :
 
             u = ptnet.unfolding.Unfolding()
 
-            ET.register_namespace('',"http://www.pnml.org/version-2009/grammar/ptnet")
-
-            tree = ET.parse(cuf.name)
+            tree = etree.parse(cuf.name)
             root = tree.getroot()
+            net = root.getchildren()[0]
+            child = net.getchildren()[0]
+            net.remove(child)
 
-            print(root.tag)
-            print(root.findall('original_net'))
-            print(root.findall('ns0:origina_net'))
-            print(root.findall('{http://www.pnml.org/version-2009/grammar/ptnet}original_net'))
+            for target in root.findall('.//{http://www.pnml.org/version-2009/grammar/pnml}originalNode'):
+                target.getparent().remove(target)
 
-            for node in root.findall('original_net'):
-                print('\n\n\nTTTTTTTTTTT\n\n\n')
-                root.remove(node)
+            etree.dump(root)
 
-            ET.ElementTree(root).write('cuf.bak.pnml')
+            et = etree.ElementTree(root)
+            et.write(open(cuf.name,'wb'), pretty_print=True)
+
 
             if unf=="punf":
-                u.read(open('cuf.bak.pnml','rb'),fmt='pnml')
+                u.read(cuf,fmt='pnml')
             else:
                 u.read(cuf)
 
