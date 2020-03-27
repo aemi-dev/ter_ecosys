@@ -7,3 +7,7 @@ run: ./ecco/rr/__init__.py
 
 clean:
 	rm -rf *.pnml
+
+
+# o.write(open('punf.dot','w'),fmt="dot",m=0) 
+# dot -T pdf punf.dot -o punf.dot.pdf

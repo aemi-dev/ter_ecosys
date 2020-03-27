@@ -11,3 +11,11 @@
     - mole
     - ...
 - Chercher unfolder
+
+
+
+
+
+
+- Iterer sur les places
+	-> collections.defaultdict(set=(pre)(post))

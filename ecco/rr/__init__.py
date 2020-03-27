@@ -1095,7 +1095,7 @@ class Model (_Model) :
                     parent.remove(node)
                     name = parent.getchildren()[0].getchildren()[0]
                     nameText = name.text
-                    name.text = "b'%s':%s" % (nodeText,nameText)
+                    name.text = "'%s':%s" % (nodeText,nameText)
 
                 for arc in root.findall('.//{http://www.pnml.org/version-2009/grammar/pnml}arc'):
                     src = arc.get('source')

@@ -1,6 +1,8 @@
 
 import sys
+import os, tempfile
 import xml.parsers.expat
+from datetime import date
 
 class Transition :
     def __init__ (self, name) :
@@ -1021,6 +1023,18 @@ class Net :
         if 'data' not in self.__pnmlitm : return
         k = self.__pnmlitm['data']
         self.__pnmlitm[k] += data
+
+    def toPDF(self, path=".", fileName = ""):
+        with tempfile.NamedTemporaryFile('w',suffix=".dot") as dotFile:
+            self.write( dotFile, fmt="dot", m=0 )
+            os.system("dot -T pdf %s -o %s.pdf" % (dotFile.name,dotFile.name) )
+            if len(path) > 1 and path[-1] != '/':
+                path = path + '/'
+            if len(fileName) == 0:
+                fileName = "dot-to-pdf.%s.pdf" % (date.today)
+            os.system("cp %s %s%s" % (dotFile.name,path,fileName) )
+
+
 
 def test1 () :
     n = Net (True)
