@@ -1,6 +1,7 @@
 import itertools, re, os, tempfile, operator, functools, sys, shutil
 import xml.etree.ElementTree as ET
 from lxml import etree
+from collections import defaultdict
 import pandas as pd
 import numpy as np
 import ptnet
@@ -1117,6 +1118,28 @@ class Model (_Model) :
                 u.read(cuf,fmt='pnml')
             else:
                 u.read(cuf)
+
+            if unf == "punf":
+                placesList = u.places
+                placesDict = defaultdict(list)
+                for place in placesList:
+                    name = place.name
+                    ident = place.ident
+                    part1 = name.split(':',1)
+                    part2 = part1[0].split('@',1)
+                    part3 = part2[0].split('\'')
+                    originalName = part3[1]
+                    placesDict[originalName].append(place)
+
+                for p, ts in placesDict.items():
+                    print(p)
+                    for t in ts:
+                        for t_ in ts:
+                            if t != t_ and t_ in u.places and t.pre == t_.pre and t.post == t_.post:
+                                u.place_rem(t_)
+
+                print(placesDict)
+
 
         return u
 

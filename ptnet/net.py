@@ -256,6 +256,11 @@ class Net :
         # print 'place_add', name, m0
         return p
 
+    def place_rem (self, place) :
+        self.places.remove (place)
+        return True
+        # print 'place_rem', place
+    
     def trans_add (self, name) :
         t = Transition (name)
         self.trans.append (t)
