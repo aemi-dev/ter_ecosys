@@ -1119,17 +1119,16 @@ class Model (_Model) :
             else:
                 u.read(cuf)
 
+            def originalName( place ):
+                part1 = place.name.split(':',1)
+                part2 = part1[0].split('@',1)
+                return (part2[0].split('\''))[1]
+
             if unf == "punf":
                 placesList = u.places
                 placesDict = defaultdict(list)
                 for place in placesList:
-                    name = place.name
-                    ident = place.ident
-                    part1 = name.split(':',1)
-                    part2 = part1[0].split('@',1)
-                    part3 = part2[0].split('\'')
-                    originalName = part3[1]
-                    placesDict[originalName].append(place)
+                    placesDict[originalName(place)].append(place)
 
                 for p, ts in placesDict.items():
                     print(p)
@@ -1137,8 +1136,49 @@ class Model (_Model) :
                         for t_ in ts:
                             if t != t_ and t_ in u.places and t.pre == t_.pre and t.post == t_.post:
                                 u.place_rem(t_)
+                                for tr in u.trans:
+                                    tr.pre.discard(t_)
+                                    tr.post.discard(t_)
 
-                print(placesDict)
+                transList = u.trans
+                
+                for tr in transList:
+                    print(' --- --- --- \n%s' % tr.ident )
+                    print (tr.pre)
+                    print (tr.post)
+
+                    preList = list(tr.pre)
+                    postList = list(tr.post)
+
+                    for ppr in preList:
+                        for ppo in postList:
+                            if ( originalName(ppr) == originalName(ppo) ):
+                                print(' %s equals %s ' % (ppr.ident, ppo.ident) )
+
+                                print('pre ',ppr.pre,' -- ',ppo.pre)
+                                ppr.pre |= ppo.pre
+                                print('pre ',ppr.pre,' -- ',ppo.pre)
+                                
+                                print('post ',ppr.post,' -- ',ppo.post)
+                                ppr.post |= ppo.post
+                                print('post ',ppr.post,' -- ',ppo.post)
+
+                                ppr.pre.discard(tr)
+                                ppr.post.discard(tr)
+
+                                ppr.cont_add(tr)
+
+                                for ttr in transList:
+                                    ttr.pre.discard(ppo)
+                                    ttr.post.discard(ppo)
+                                    if ttr == tr:
+                                        preList = list(ttr.pre)
+                                        postList = list(ttr.post)
+
+                                u.place_rem(ppo)
+
+
+
 
 
         return u
