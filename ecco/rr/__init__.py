@@ -1119,10 +1119,35 @@ class Model (_Model) :
             else:
                 u.read(cuf)
 
-            def originalName( place ):
-                part1 = place.name.split(':',1)
+            def originalName( pl ):
+                part1 = pl.name.split(':',1)
                 part2 = part1[0].split('@',1)
                 return (part2[0].split('\''))[1]
+            
+            def readArcsAvailable( tr, pl ):
+                poln = originalName( pl )
+                for pol in list(tr.post):
+                    if ( poln == originalName( pol ) ):
+                        return pol
+                return False
+            
+            def makeReadArcs( tr, pre, post ):
+                pre.pre |= post.pre
+                pre.post |= post.post
+                pre.pre.discard(tr)
+                pre.post.discard(tr)
+                pre.cont_add(tr)
+
+                for potr in list(post.post):
+                    pola = readArcsAvailable( potr, post )
+                    if pola: makeReadArcs( potr, pre, pola )
+            
+                for ttr in u.trans:
+                    ttr.pre_rem( post )
+                    ttr.post_rem( post )
+
+                u.place_rem( post )
+
 
             if unf == "punf":
                 placesList = u.places
@@ -1139,46 +1164,11 @@ class Model (_Model) :
                                 for tr in u.trans:
                                     tr.pre.discard(t_)
                                     tr.post.discard(t_)
-
-                transList = u.trans
                 
-                for tr in transList:
-                    print(' --- --- --- \n%s' % tr.ident )
-                    print (tr.pre)
-                    print (tr.post)
-
-                    preList = list(tr.pre)
-                    postList = list(tr.post)
-
-                    for ppr in preList:
-                        for ppo in postList:
-                            if ( originalName(ppr) == originalName(ppo) ):
-                                print(' %s equals %s ' % (ppr.ident, ppo.ident) )
-
-                                print('pre ',ppr.pre,' -- ',ppo.pre)
-                                ppr.pre |= ppo.pre
-                                print('pre ',ppr.pre,' -- ',ppo.pre)
-                                
-                                print('post ',ppr.post,' -- ',ppo.post)
-                                ppr.post |= ppo.post
-                                print('post ',ppr.post,' -- ',ppo.post)
-
-                                ppr.pre.discard(tr)
-                                ppr.post.discard(tr)
-
-                                ppr.cont_add(tr)
-
-                                for ttr in transList:
-                                    ttr.pre.discard(ppo)
-                                    ttr.post.discard(ppo)
-                                    if ttr == tr:
-                                        preList = list(ttr.pre)
-                                        postList = list(ttr.post)
-
-                                u.place_rem(ppo)
-
-
-
+                for tr in u.trans:
+                    for pre in list( tr.pre ):
+                        post = readArcsAvailable( tr, pre )
+                        if post: makeReadArcs( tr, pre, post )
 
 
         return u
