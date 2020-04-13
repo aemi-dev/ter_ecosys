@@ -257,6 +257,7 @@ class Net :
         return p
 
     def place_rem (self, place) :
+        if place not in self.places: return
         self.places.remove (place)
         return True
         # print 'place_rem', place
