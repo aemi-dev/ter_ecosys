@@ -1055,7 +1055,7 @@ class Model (_Model) :
                         t.pre_add(places[off])
                         t.post_add(places[on])
         return n
-    def unfold (self,unf="cunf",rule="mcm",ra=True,opr=True) :
+    def unfold (self,unf="cunf",rule="mcm",ra=True,opr=True,od=True,oc=True) :
         n = None
 
         if unf == "punf" :
@@ -1075,9 +1075,7 @@ class Model (_Model) :
                 os.system("cunf -c %s -s %s %s" % (rule,cuf.name, pep.name))
             elif unf == "punf":
                 os.system("punf %s -c -f=%s -m=%s" % ( '-r' if opr else '', pep.name, cuf.name))
-
             u = ptnet.unfolding.Unfolding()
-
             if unf == "punf":
                 parsed_pnml = etree.parse(cuf.name)
                 pnml_root = parsed_pnml.getroot()
@@ -1089,7 +1087,6 @@ class Model (_Model) :
                 page_node = net_node.getchildren()[0]
                 page_node.set('id','page')
                 page_node.remove(page_node.getchildren()[0])
-
                 for node in pnml_root.findall('.//{http://www.pnml.org/version-2009/grammar/pnml}originalNode'):
                     nodeText = node.getchildren()[0].text
                     parent = node.getparent()
@@ -1097,7 +1094,6 @@ class Model (_Model) :
                     name = parent.getchildren()[0].getchildren()[0]
                     nameText = name.text
                     name.text = "'%s':%s" % (nodeText,nameText)
-
                 for arc in pnml_root.findall('.//{http://www.pnml.org/version-2009/grammar/pnml}arc'):
                     src = arc.get('source')
                     tgt = arc.get('target')
@@ -1106,118 +1102,85 @@ class Model (_Model) :
                     arc.set('id','%s%s' % (src, tgt) )
                     arc.set('source',src)
                     arc.set('target',tgt)
-
-
                 et = etree.ElementTree(pnml_root)
                 et.write(open(cuf.name,'wb'), pretty_print=True, xml_declaration=True)
-
-
             if unf=="punf":
                 u.read(cuf,fmt='pnml')
             else:
                 u.read(cuf)
-
             def getName( pl ):
                 p1 = pl.name.split(':',1)
                 p2 = p1[0].split('@',1)
                 return (p2[0].split('\''))[1]
-            
             def isChained( at, ap ):
                 apn = getName( ap )
                 for pp in at.post:
                     if apn == getName( pp ): return pp
                 return False
-
             def duplicates( at, apo ):
                 dups = list()
                 apon = getName( apo )
                 for apo_tr in at.post:
                     if apo != apo_tr and apon == getName(apo_tr) and apo.pre == apo_tr.pre and apo.post == apo_tr.post:
                         dups.append( apo_tr )
-            
             def makeReadArcs( at, apr, apo ):
-
                 for tr_pr in list(apo.pre):
                     if tr_pr not in apr.pre:
                         apr.pre_add( tr_pr )
-
                 for tr_po in list(apo.post):
                     if tr_po not in apr.post:
                         apr.post_add( tr_po )
-
                 apr.pre_rem( at )
                 apr.post_rem( at )
                 apr.cont_add( at )
-
                 for po_tr in apo.post:
                     cp = isChained( po_tr, apo )
                     if cp: makeReadArcs( po_tr, apr, cp )
-            
                 apopre = list(apo.pre)
                 for tr_pr_rem in apopre:
                     apo.pre_rem( tr_pr_rem )
                 apopost = list(apo.post)
                 for tr_po_rem in apopost:
                     apo.post_rem( tr_po_rem )
-
                 u.place_rem( apo )
-
-
             if unf == "punf":
                 pl = list(u.places)
                 pll = len( pl )
                 pd = defaultdict(list)
                 for p in pl:
                     pd[getName(p)].append(p)
-                
-                print( pd )
-
-                dups = 0
-
-                print( '--- places : %d\n--- dupls. : %d\n--- chnds. : %d' % (pll,0,0) )
-
-                for pn, epl in pd.items():
-                    for i in range(0,len(epl)):
-                        ei = epl[i]
-                        eipr = list(ei.pre)
-                        eipo = list(ei.post)
-                        for j in range(i+1,len(epl)):
-                            ej = epl[j]
-                            if ei != ej:
-                                ejpr = list(ej.pre)
-                                ejpo = list(ej.post)
-                                if eipr == ejpr and eipo == ejpo:
-                                    for trpr in ejpr:
-                                        ej.pre_rem( trpr )
-                                        trpr.post_rem( ej )
-                                        trpr.post.discard( ej )
-                                    for trpo in ejpo:
-                                        ej.post_rem( trpo )
-                                        trpo.pre_rem( ej )
-                                        trpo.pre.discard( ej )
-                                    for trans in u.trans:
-                                        trans.pre_rem( ej )
-                                        trans.pre.discard( ej )
-                                        trans.post_rem( ej )
-                                        trans.post.discard( ej )
-                                    u.place_rem( ej )
-
-                pnt = pll
-                pll -= len(list(u.places))
-                pnt -= pll
-
-                print( '--- places : %d\n--- dupls. : %d\n--- chnds. : %d' % (pnt,pll,0) )
-                
-                for utr in u.trans:
-                    upre = list(utr.pre)
-                    for i in range(0,len(upre)):
-                        cp = isChained( utr, upre[i] )
-                        if cp: makeReadArcs( utr, upre[i], cp )
-                
-                pncc = len(u.places)
-                pnt-=pncc
-                print( '--- places : %d\n--- dupls. : %d\n--- chnds. : %d' % (pncc,pll,pnt) )
-
+                if od:
+                    for pn, epl in pd.items():
+                        for i in range(0,len(epl)):
+                            ei = epl[i]
+                            eipr = list(ei.pre)
+                            eipo = list(ei.post)
+                            for j in range(i+1,len(epl)):
+                                ej = epl[j]
+                                if ei != ej:
+                                    ejpr = list(ej.pre)
+                                    ejpo = list(ej.post)
+                                    if eipr == ejpr and eipo == ejpo:
+                                        for trpr in ejpr:
+                                            ej.pre_rem( trpr )
+                                            trpr.post_rem( ej )
+                                            trpr.post.discard( ej )
+                                        for trpo in ejpo:
+                                            ej.post_rem( trpo )
+                                            trpo.pre_rem( ej )
+                                            trpo.pre.discard( ej )
+                                        for trans in u.trans:
+                                            trans.pre_rem( ej )
+                                            trans.pre.discard( ej )
+                                            trans.post_rem( ej )
+                                            trans.post.discard( ej )
+                                        u.place_rem( ej )
+                if oc:
+                    for utr in u.trans:
+                        upre = list(utr.pre)
+                        for i in range(0,len(upre)):
+                            cp = isChained( utr, upre[i] )
+                            if cp: makeReadArcs( utr, upre[i], cp )
 
         return u
 

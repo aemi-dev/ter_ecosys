@@ -1,0 +1,48 @@
+digraph {
+	/* transitions */
+	node	[shape=box style=filled fillcolor=gray80];
+	t139737577118352 [label="b'R2.2':e0"];
+	t139737577119024 [label="b'R1.1':e1"];
+	t139737577116528 [label="b'R3.1':e2"];
+	t139737577116048 [label="b'R2.3':*e3"];
+
+	/* places, flow and context relations */
+	node	[shape=circle fillcolor=gray95];
+	p139737577119552 [label="b'Rp+':c0 (1)"];
+	p139737577119552 -> t139737577116048;
+	p139737577119552 -> t139737577118352;
+	p139737577119552 -> t139737577119024 [arrowhead=none color=red];
+	p139737577119552 -> t139737577116528 [arrowhead=none color=red];
+
+	p139737577119072 [label="b'Wk-':c1 (1)"];
+	p139737577119072 -> t139737577119024;
+	p139737577119072 -> t139737577118352 [arrowhead=none color=red];
+
+	p139737966653936 [label="b'Sd-':c2 (1)"];
+	p139737966653936 -> t139737577116528;
+	p139737966653936 -> t139737577116048 [arrowhead=none color=red];
+	p139737966653936 -> t139737577118352 [arrowhead=none color=red];
+
+	p139737966656096 [label="b'Ac+':c3 (1)"];
+	p139737966656096 -> t139737577116048 [arrowhead=none color=red];
+	p139737966656096 -> t139737577118352 [arrowhead=none color=red];
+
+	p139737966656288 [label="b'Wk+':c4"];
+	t139737577119024 -> p139737966656288;
+	p139737966656288 -> t139737577116048;
+	p139737966656288 -> t139737577116528 [arrowhead=none color=red];
+
+	p139737966654752 [label="b'Rp-':c5"];
+	t139737577118352 -> p139737966654752;
+
+	p139737966656384 [label="b'Wk-':c6"];
+	t139737577116048 -> p139737966656384;
+
+	p139737966654560 [label="b'Rp-':c7"];
+	t139737577116048 -> p139737966654560;
+
+	p139737966654032 [label="b'Sd+':c8"];
+	t139737577116528 -> p139737966654032;
+
+	graph [label="4 transitions\n9 places"];
+}
