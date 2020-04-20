@@ -1134,8 +1134,6 @@ class Model (_Model) :
                 for apo_tr in at.post:
                     if apo != apo_tr and apon == getName(apo_tr) and apo.pre == apo_tr.pre and apo.post == apo_tr.post:
                         dups.append( apo_tr )
-
-                    
             
             def makeReadArcs( at, apr, apo ):
 

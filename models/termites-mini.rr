@@ -1,8 +1,13 @@
 inhabitants:
     Rp+: reproductives
+    Wk-: workers
+    Sd-: soldiers
 
-structures:
-    Ec-: egg chambers
+competitors:
+    Ac+: ant competitors
 
 rules:
-    Rp+ >> Ec+
+    Rp+ >> Wk+
+    Ac+, Sd- >> Wk-, Rp-
+    Wk+ >> Sd+, Rp+
+
