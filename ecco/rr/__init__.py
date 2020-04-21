@@ -1130,6 +1130,9 @@ class Model (_Model) :
                 for tr_po in list(apo.post):
                     if tr_po not in apr.post:
                         apr.post_add( tr_po )
+                for tr_co in list(apo.cont):
+                    if tr_co not in apr.cont:
+                        apr.cont_add( tr_co )
                 apr.pre_rem( at )
                 apr.post_rem( at )
                 apr.cont_add( at )
@@ -1155,12 +1158,14 @@ class Model (_Model) :
                             ei = epl[i]
                             eipr = list(ei.pre)
                             eipo = list(ei.post)
+                            eico = list(ei.cont)
                             for j in range(i+1,len(epl)):
                                 ej = epl[j]
                                 if ei != ej:
                                     ejpr = list(ej.pre)
                                     ejpo = list(ej.post)
-                                    if eipr == ejpr and eipo == ejpo:
+                                    ejco = list(ej.cont)
+                                    if eipr == ejpr and eipo == ejpo and eico == ejco:
                                         for trpr in ejpr:
                                             ej.pre_rem( trpr )
                                             trpr.post_rem( ej )
@@ -1169,6 +1174,10 @@ class Model (_Model) :
                                             ej.post_rem( trpo )
                                             trpo.pre_rem( ej )
                                             trpo.pre.discard( ej )
+                                        for trco in ejco:
+                                            ej.cont_rem( trco )
+                                            trco.cont_rem( ej )
+                                            trco.cont.discard( ej )
                                         for trans in u.trans:
                                             trans.pre_rem( ej )
                                             trans.pre.discard( ej )
